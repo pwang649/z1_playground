@@ -1,3 +1,4 @@
+import time
 import requests
 import numpy as np
 np.set_printoptions(precision=3)
@@ -57,9 +58,27 @@ def MoveJ(q: list, gripperPos = 0, speed = 0.5):
     }
     return requests.post(url, json=data)
 
+def setGripper(position, speed=128, force=128):
+    position = max(0, min(255, position))
+    speed = max(0, min(255, speed))
+    force = max(0, min(255, force))
+
+    data = database.copy()
+    data["func"] = "setGripper"
+    data["args"] = {
+        "position": position,
+        "speed": speed,
+        "force": force,
+    }
+    return requests.post(url, json=data)
+
 # test
 if __name__ == "__main__":
-    labelRun("forward")
-    MoveJ([0,0,-0.5,0,0,0])
-    backToStart()
+    # labelRun("forward")
+    # MoveJ([0,0,-0.5,0,0,0])
+    setGripper(255) # Close
+    time.sleep(2)
+    setGripper(0) # Open
+    time.sleep(2)
+    # backToStart()
     Passive()

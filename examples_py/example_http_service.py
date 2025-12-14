@@ -1,7 +1,7 @@
 import sys
 sys.path.append("../lib")
 import unitree_arm_interface
-import time
+from robotiq import RobotiqGripper
 import numpy as np
 np.set_printoptions(precision=3, suppress=True)
 
@@ -9,7 +9,11 @@ np.set_printoptions(precision=3, suppress=True)
 You can use fastapi to encapsulate z1_sdk for http interface call.
 """
 
-arm =  unitree_arm_interface.ArmInterface(hasGripper=True)
+arm =  unitree_arm_interface.ArmInterface(hasGripper=False)
+gripper = RobotiqGripper("/dev/ttyUSB1")
+gripper.connect()
+gripper.activate()
+gripper.open()
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -61,6 +65,14 @@ def z1_server(item: RequestDataType):
                 return {"func": item.func, "status": "failed"}
         elif item.func == "getQ":
             return {"q": arm.lowstate.getQ().tolist()}
+        elif item.func == "setGripper":
+            position = item.args["position"]
+            speed = item.args["speed"]
+            force = item.args["force"]
+            if gripper.set_grip(position, speed, force):
+                return {"func": item.func, "status": "success"}
+            else:
+                return {"func": item.func, "status": "failed"}
     except Exception as e:
         return {"func": item.func, "status": "failed", "error": str(e)}
 
