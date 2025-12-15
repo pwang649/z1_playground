@@ -76,9 +76,9 @@ def setGripper(position, speed=128, force=128):
 if __name__ == "__main__":
     # labelRun("forward")
     # MoveJ([0,0,-0.5,0,0,0])
-    setGripper(255) # Close
+    setGripper(255, 255, 255) # Close
     time.sleep(2)
-    setGripper(0) # Open
+    setGripper(0, 255, 255) # Open
     time.sleep(2)
     # backToStart()
     Passive()

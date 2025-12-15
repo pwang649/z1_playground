@@ -44,14 +44,16 @@ class RobotiqGripper:
         # Clear rACT
         self.client.write_registers(
             0x03E8,
-            [0x0000, 0x0000, 0x0000]
+            [0x0000, 0x0000, 0x0000],
+            unit=0x0009
         )
         time.sleep(0.5)
 
         # Set rACT
         self.client.write_registers(
             0x03E8,
-            [0x0100, 0x0000, 0x0000]
+            [0x0100, 0x0000, 0x0000],
+            unit=0x0009
         )
         time.sleep(1.0)
 
@@ -74,9 +76,13 @@ class RobotiqGripper:
 
 if __name__ == "__main__":
     gripper = RobotiqGripper("/dev/ttyUSB1")
-    gripper.connect()
-    gripper.activate()
-    gripper.open()
-    time.sleep(1)
-    gripper.close()
-    gripper.disconnect()
+    try:
+        gripper.connect()
+        gripper.activate()
+        gripper.close()
+        time.sleep(1)
+        gripper.open()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        gripper.disconnect()
