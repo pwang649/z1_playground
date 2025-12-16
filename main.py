@@ -71,6 +71,20 @@ def MoveJ(q: list, gripperPos=0, speed=0.5):
     }
     return requests.post(url, json=data)
 
+def setGripper(position, speed=128, force=128):
+    position = max(0, min(255, position))
+    speed = max(0, min(255, speed))
+    force = max(0, min(255, force))
+
+    data = database.copy()
+    data["func"] = "setGripper"
+    data["args"] = {
+        "position": position,
+        "speed": speed,
+        "force": force,
+    }
+    return requests.post(url, json=data)
+
 # -----------------------------------------------------------------------------
 # 1. XML SETUP (Wrapper to combine Z1 and the Object)
 # -----------------------------------------------------------------------------
@@ -337,8 +351,10 @@ def main():
     labelRun("forward")
     for i, waypoint in enumerate(path):
         MoveJ(waypoint.tolist(), gripperPos=-1.5, speed=0.7)
+        setGripper(0, 255, 255)
         if i == len(path) - 1:
             MoveJ(waypoint.tolist(), gripperPos=0, speed=0.7)
+            setGripper(255, 255, 255)
         # for _ in range(50):
         #     data.ctrl[:6] = waypoint
         #     mujoco.mj_step(model, data)
@@ -352,6 +368,7 @@ def main():
     input()
     labelRun("forward")
     MoveJ(waypoint.tolist(), gripperPos=-1.5, speed=0.7)
+    setGripper(255, 255, 255)
     # 5. Close Gripper
     print("Closing Gripper...")
     for _ in range(100):
